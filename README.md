@@ -52,6 +52,22 @@ Pages 免费版每次部署最多 2 万个文件，本项目约 7000 个。
 
 学习进度（星星、贴纸、连续天数）同样保存在 localStorage 里，换设备或清除浏览器数据后会丢失。
 
+## 朗读语音（可选）
+
+朗读默认用设备自带的语音合成，听起来比较生硬。配置豆包语音合成后，会换成更自然的真人感语音（默认音色是「儿童绘本 2.0」）：
+
+1. 登录火山引擎控制台，进入「豆包语音」，开通「豆包语音合成模型 2.0」（字符版）
+2. 在「API Key 管理」里创建一个 Key（和火山方舟的 Key 不是同一个）
+3. Cloudflare → Workers & Pages → hanzi-kids → **Settings → Variables and Secrets** → Add → 类型选 **Secret**，名称填 `TTS_API_KEY`，值填这个 Key
+4. 到 **Deployments** 里对最新一次部署点「Retry deployment」，让设置生效
+
+想换音色的话，再加一个普通变量 `TTS_VOICE`，填 [音色列表](https://www.volcengine.com/docs/6561/1257544) 里「豆包语音合成模型 2.0」音色的 voice_type（比如 `zh_female_shaoergushi_uranus_bigtts` 少儿故事、`zh_female_wenroumama_uranus_bigtts` 温柔妈妈），然后重新部署。
+
+注意：
+- Key 保存在 Cloudflare 上，浏览器通过 `functions/api/tts.js` 转发请求，所以每台设备都不用单独填写
+- 合成过的语音会缓存在 Cloudflare 和设备上，同一个词不会重复收费；单次最多 120 个字
+- 没配置 Key、断网或者合成失败时，会自动改用设备自带的语音
+
 ## 本地开发
 
 需要 Node.js 20 或更高版本。
@@ -62,6 +78,8 @@ npm run dev            # http://localhost:5173
 npm run build          # 构建到 dist/
 npm run lint
 ```
+
+`npm run dev` 不会运行 `functions/` 下的接口，朗读会用设备自带的语音。
 
 ## 字典数据
 
@@ -94,6 +112,7 @@ npm run build:dict
 ```
 scripts/            字典生成、笔顺数据复制
 public/data/chars/  生成好的字典数据
+functions/api/      Pages Functions：豆包语音合成转发
 src/
   views/            页面：首页（查字 + 学字）、生字本
   components/char/  字卡、组词、笔顺面板、AI 讲解

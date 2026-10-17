@@ -35,6 +35,11 @@ export default defineConfig({
             options: { cacheName: 'dict-data', expiration: { maxEntries: 8000 } },
           },
           {
+            urlPattern: ({ url }) => url.pathname === '/api/tts',
+            handler: 'CacheFirst',
+            options: { cacheName: 'tts', expiration: { maxEntries: 3000 } },
+          },
+          {
             urlPattern: ({ url }) => /fonts\.(googleapis|gstatic)\.com$/.test(url.hostname),
             handler: 'StaleWhileRevalidate',
             options: { cacheName: 'fonts' },
