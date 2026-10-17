@@ -1,5 +1,6 @@
-// Volcengine Ark (Doubao) chat completions
+// Volcengine Ark (Doubao) chat completions, called straight from the browser
 const ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions'
+export const DEFAULT_MODEL = 'doubao-seed-2-1-lite-260915'
 const FIELDS = ['meaning', 'memoryTip', 'sentence']
 
 const SYSTEM = `你是「小墨」，一只温柔、有趣的小熊猫老师，正在教一个 9 岁的小学生认识汉字。
@@ -20,14 +21,14 @@ export function parseExplanation(text) {
   return Object.fromEntries(FIELDS.map((key) => [key, obj[key].trim()]))
 }
 
-export async function explainCharacter(entry, env) {
+export async function explainCharacter(entry, { apiKey, model }) {
   const readings = entry.readings.map((r) => `${r.pinyin}：${r.meanings.join('；') || '（无）'}`).join('\n')
   const words = entry.words.map((w) => w.word).join('、')
   const res = await fetch(ENDPOINT, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${env.ARK_API_KEY}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: env.ARK_MODEL,
+      model: model || DEFAULT_MODEL,
       thinking: { type: 'disabled' },
       max_tokens: 1024,
       messages: [
@@ -39,7 +40,7 @@ export async function explainCharacter(entry, env) {
       ],
     }),
   })
-  if (!res.ok) throw new Error(`Ark HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`)
   const data = await res.json()
   return parseExplanation(data.choices?.[0]?.message?.content || '')
 }

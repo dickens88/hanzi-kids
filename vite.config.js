@@ -28,7 +28,6 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         globIgnores: ['data/**'],
-        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/data/'),
@@ -46,6 +45,5 @@ export default defineConfig({
   ],
   server: {
     host: true,
-    proxy: { '/api': 'http://localhost:8787' },
   },
 })

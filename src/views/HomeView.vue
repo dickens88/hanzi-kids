@@ -93,7 +93,7 @@ async function practiceAgain() {
         <div class="space-y-5">
           <CharInfo :entry="entry" />
           <WordBubbles :char="entry.char" :words="entry.words" :readings="entry.readings" />
-          <AiExplain :char="entry.char" />
+          <AiExplain :entry="entry" />
         </div>
       </div>
     </template>

@@ -1,24 +1,21 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useSpeech } from '../../composables/useSpeech.js'
+import { useAiSettings } from '../../composables/useAiSettings.js'
+import { explainCharacter } from '../../utils/ark.js'
 
 const props = defineProps({
-  char: { type: String, required: true },
+  entry: { type: Object, required: true },
 })
 
-const enabled = ref(false)
 const loading = ref(false)
 const failed = ref(false)
 const result = ref(null)
 const { speak } = useSpeech()
-
-fetch('/api/features')
-  .then((res) => (res.ok ? res.json() : {}))
-  .then((f) => (enabled.value = !!f.aiExplanation))
-  .catch(() => {})
+const { settings, enabled, cachedExplanation, saveExplanation } = useAiSettings()
 
 watch(
-  () => props.char,
+  () => props.entry.char,
   () => {
     result.value = null
     failed.value = false
@@ -26,14 +23,20 @@ watch(
 )
 
 async function ask() {
+  const char = props.entry.char
   loading.value = true
   failed.value = false
   try {
-    const res = await fetch(`/api/characters/${encodeURIComponent(props.char)}/explanation`)
-    if (!res.ok) throw new Error(res.statusText)
-    result.value = await res.json()
-    speak(`${result.value.meaning}${result.value.sentence}`)
-  } catch {
+    let explanation = cachedExplanation(char)
+    if (!explanation) {
+      explanation = await explainCharacter(props.entry, settings)
+      saveExplanation(char, explanation)
+    }
+    if (char !== props.entry.char) return
+    result.value = explanation
+    speak(`${explanation.meaning}${explanation.sentence}`)
+  } catch (err) {
+    console.warn('AI explanation failed:', err)
     failed.value = true
   } finally {
     loading.value = false

@@ -1,7 +1,10 @@
 <script setup>
+import { ref } from 'vue'
+import AiSettingsDialog from './components/common/AiSettingsDialog.vue'
 import { useProgress } from './composables/useProgress.js'
 
 const { learnedCount, streak } = useProgress()
+const showSettings = ref(false)
 </script>
 
 <template>
@@ -18,8 +21,12 @@ const { learnedCount, streak } = useProgress()
           <span>生字本</span>
           <span class="rounded-full bg-berry px-2 text-base text-white">{{ learnedCount }}</span>
         </RouterLink>
+        <button class="btn bg-white px-4 shadow-sm" aria-label="设置" @click="showSettings = true">
+          <span class="material-symbols-rounded">settings</span>
+        </button>
       </nav>
     </header>
     <RouterView />
+    <AiSettingsDialog v-if="showSettings" @close="showSettings = false" />
   </div>
 </template>
