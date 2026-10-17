@@ -1,7 +1,0 @@
-node_modules
-dist
-dev-dist
-.cache
-data
-public/data/strokes
-.git

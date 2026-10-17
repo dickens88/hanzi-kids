@@ -5,54 +5,76 @@
 - **认一认**：拼音（多音字的每个读音分开列出）、部首、笔画数和简单释义，点一下就能朗读
 - **组一组**：6–8 个常用词，上方标注拼音，点一下就能朗读；多音字的组词按读音分行显示
 - **写一写**：在田字格里看笔顺动画、一笔一笔跟着学，或者自己用手指描红（写错时会给出提示）
-- **小墨讲给你听**（可选）：由 Claude 用孩子听得懂的话讲解字义，再给一个记字小窍门和一句例句
+- **小墨讲给你听**（可选）：由火山引擎的豆包大模型用孩子听得懂的话讲解字义，再给一个记字小窍门和一句例句
 
 写完一个字会按出错次数得 1–3 颗星，并获得一张贴纸。生字本里能看到贴纸墙、连续学习天数和识字徽章，还可以挑星星少的字复习。
 
-## 快速开始
+## 部署到 Cloudflare
 
-需要 Node.js 20 或更高版本。
+整个应用跑在 Cloudflare Workers 上，不需要自己的服务器。免费版的额度对家庭使用来说足够：静态文件请求不限次数，接口每天 10 万次，KV 每天可写 1000 次。
+
+需要准备：
+
+- Node.js 20 或更高版本
+- 一个免费的 Cloudflare 账号
+- 火山方舟的 API Key（可选，不用 AI 讲解可以跳过）
 
 ```bash
 npm install
-npm run dev          # 前端开发服务器 http://localhost:5173
-npm run dev:server   # 另开一个终端：后端 API（AI 讲解用），端口 8787
+npx wrangler login                                   # 浏览器里授权 Cloudflare 账号
+npx wrangler kv namespace create EXPLANATIONS        # 创建 AI 讲解的缓存
 ```
 
-生产环境运行：
+把上面命令输出的 `id` 填进 `wrangler.jsonc` 的 `kv_namespaces`，替换掉 `REPLACE_WITH_KV_NAMESPACE_ID`。然后：
 
 ```bash
-npm run build
-ANTHROPIC_API_KEY=sk-ant-... npm start   # http://localhost:8787
+npx wrangler secret put ARK_API_KEY                  # 粘贴火山方舟的 API Key（可选）
+npm run deploy
 ```
 
-不设置 `ANTHROPIC_API_KEY` 也能正常使用，只是不会显示「小墨讲给你听」按钮。
+部署成功后会输出一个 `https://hanzi-kids.<你的子域名>.workers.dev` 地址。以后改了代码，再运行一次 `npm run deploy` 就行。
 
-### Docker
+不设置 `ARK_API_KEY` 也能正常使用，只是不会显示「小墨讲给你听」按钮。
 
-```bash
-docker build -t hanzi-kids .
-docker run -d -p 8787:8787 -e ANTHROPIC_API_KEY=sk-ant-... -v hanzi-kids-data:/app/data hanzi-kids
-```
+### 火山方舟 API Key
 
-AI 讲解的结果会缓存在 `/app/data/explanations.json` 里，同一个字只会调用一次 Claude，所以总花费有上限（字典一共 3498 个字）。
+1. 登录 [火山方舟控制台](https://console.volcengine.com/ark)
+2. 在「开通管理」里开通要用的模型（默认是 `doubao-seed-2-1-lite-260915`）
+3. 在「API Key 管理」里创建一个 Key
+
+想换模型的话，改 `wrangler.jsonc` 里的 `ARK_MODEL`，填控制台模型列表里的完整 Model ID，然后重新部署。程序会关闭模型的深度思考（`thinking: disabled`），让回答更快、更省钱。
+
+AI 讲解的结果会缓存在 Cloudflare KV 里，同一个字只会调用一次模型，所以总花费有上限（字典一共 3498 个字）。
 
 ### 在 iPad 上使用
 
-1. 在家里的电脑或 NAS 上运行服务，让 iPad 和它连在同一个局域网里
-2. 在 iPad 的 Safari 中打开 `http://<电脑的局域网 IP>:8787`
-3. 点「分享」→「添加到主屏幕」，之后从主屏幕打开就和普通 App 一样
+1. 在 iPad 的 Safari 里打开部署后的 `https://...workers.dev` 地址
+2. 点「分享」→「添加到主屏幕」，之后从主屏幕打开就和普通 App 一样
 
-通过 HTTPS 访问时（比如部署到 Cloudflare 或套一层 Cloudflare Tunnel），查过的字会缓存在本地，之后断网也能打开。用局域网 `http://` 地址访问时，iPad 不会启用离线缓存，所有功能都能用，但服务器关掉后就打不开了。
+查过的字会缓存在 iPad 上，之后断网也能打开。
+
+## 本地开发
+
+```bash
+npm install
+npm run dev            # 前端开发服务器 http://localhost:5173
+```
+
+要在本地调试 AI 讲解接口，先在项目根目录新建 `.dev.vars` 文件，写入 `ARK_API_KEY=你的Key`，然后另开一个终端：
+
+```bash
+npm run build && npm run dev:worker    # 本地 Worker，端口 8787，前端的 /api 请求会转发到这里
+```
+
+本地运行时，KV 用的是模拟存储，不会写到线上。
 
 ## 配置
 
-| 环境变量 | 默认值 | 说明 |
+| 名称 | 位置 | 说明 |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | 无 | 设置后开启 AI 讲解 |
-| `CLAUDE_MODEL` | `claude-haiku-5-5` | AI 讲解使用的模型 |
-| `PORT` | `8787` | 服务端口 |
-| `CACHE_FILE` | `data/explanations.json` | AI 讲解缓存文件 |
+| `ARK_API_KEY` | `wrangler secret put` | 火山方舟 API Key，设置后开启 AI 讲解 |
+| `ARK_MODEL` | `wrangler.jsonc` 的 `vars` | 模型 ID，默认 `doubao-seed-2-1-lite-260915` |
+| `EXPLANATIONS` | `wrangler.jsonc` 的 `kv_namespaces` | AI 讲解缓存 |
 
 学习进度（星星、贴纸、连续天数）保存在浏览器的 localStorage 里，换设备或清除浏览器数据后会丢失。
 
@@ -87,7 +109,7 @@ npm run build:dict
 ```
 scripts/            字典生成、笔顺数据复制
 public/data/chars/  生成好的字典数据
-server/             Hono 后端：静态文件 + AI 讲解接口
+worker/             Cloudflare Worker：AI 讲解接口（火山方舟）
 src/
   views/            页面：首页（查字 + 学字）、生字本
   components/char/  字卡、组词、笔顺面板、AI 讲解
@@ -101,4 +123,4 @@ src/
 | 方法 | 路径 | 说明 |
 |---|---|---|
 | GET | `/api/features` | `{ "aiExplanation": true }`，表示是否开启了 AI 讲解 |
-| GET | `/api/characters/{字}/explanation` | 返回 `{ meaning, memoryTip, sentence }`；字不在字典里返回 404，没有配置 Key 返回 503 |
+| GET | `/api/characters/{字}/explanation` | 返回 `{ meaning, memoryTip, sentence }`；字不在字典里返回 404，没有配置 Key 返回 503，模型调用失败返回 502 |
