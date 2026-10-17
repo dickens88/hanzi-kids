@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.cache/
+/data/
+public/data/strokes/
+dev-dist/
+.DS_Store
+.env

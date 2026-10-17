@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-cream: #fff8ec;
+  --color-ink: #3b2f2f;
+  --color-sun: #ffb74d;
+  --color-sun-dark: #f59e0b;
+  --color-leaf: #66bb6a;
+  --color-sky: #4fc3f7;
+  --color-berry: #f06292;
+  --color-grape: #9575cd;
+  --font-kai: 'Kaiti SC', 'STKaiti', 'KaiTi', '楷体', serif;
+  --font-sans: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
+.card {
+  @apply rounded-3xl bg-white p-5 shadow-[0_6px_0_rgba(59,47,47,0.08)];
+}
+
+.btn {
+  @apply inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl px-5 text-lg font-bold transition active:scale-95 disabled:opacity-40;
+}
+
+/* 田字格 grid behind characters */
+.tian-grid {
+  background-color: #fff;
+  background-image:
+    linear-gradient(to right, transparent calc(50% - 1px), #f4b6b6 calc(50% - 1px), #f4b6b6 calc(50% + 1px), transparent calc(50% + 1px)),
+    linear-gradient(to bottom, transparent calc(50% - 1px), #f4b6b6 calc(50% - 1px), #f4b6b6 calc(50% + 1px), transparent calc(50% + 1px)),
+    linear-gradient(45deg, transparent calc(50% - 0.5px), #f9d6d6 calc(50% - 0.5px), #f9d6d6 calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+    linear-gradient(-45deg, transparent calc(50% - 0.5px), #f9d6d6 calc(50% - 0.5px), #f9d6d6 calc(50% + 0.5px), transparent calc(50% + 0.5px));
+  border: 3px solid #e57373;
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s ease-out both;
+}
+
+.animate-wiggle {
+  animation: wiggle 0.4s ease-in-out 2;
+}
