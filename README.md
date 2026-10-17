@@ -13,26 +13,33 @@
 
 整个应用跑在 Cloudflare Workers 上，不需要自己的服务器。免费版的额度对家庭使用来说足够：静态文件请求不限次数，接口每天 10 万次，KV 每天可写 1000 次。
 
-需要准备：
+AI 讲解用的 KV 缓存会在第一次部署时自动创建，不需要手动配置。
 
-- Node.js 20 或更高版本
-- 一个免费的 Cloudflare 账号
-- 火山方舟的 API Key（可选，不用 AI 讲解可以跳过）
+### 方式一：在 Cloudflare 控制台连接 GitHub（推荐，push 后自动上线）
+
+1. Cloudflare 控制台 → **Workers & Pages** → **Create application** → **Import a repository**
+   （注意选 Workers 下的这一项，不是 Pages）
+2. 授权 GitHub，选择仓库 `hanzi-kids`
+3. 项目设置：
+   - Project name：**hanzi-kids**（必须和 `wrangler.jsonc` 里的 `name` 一致）
+   - Build command：**npm run build**
+   - Deploy command：**npx wrangler deploy**（默认值，不用改）
+   - Production branch：选要上线的分支
+4. 点 **Deploy**，等几分钟后拿到 `https://hanzi-kids.<你的子域名>.workers.dev` 地址
+5. 进入这个 Worker → **Settings** → **Variables and Secrets** → **Add** → 类型选 **Secret**，名称填 `ARK_API_KEY`，值填火山方舟的 API Key（可选）
+
+以后改了代码，push 到上线分支就会自动重新部署。
+
+### 方式二：用命令行部署
+
+需要 Node.js 20 或更高版本。
 
 ```bash
 npm install
-npx wrangler login                                   # 浏览器里授权 Cloudflare 账号
-npx wrangler kv namespace create EXPLANATIONS        # 创建 AI 讲解的缓存
-```
-
-把上面命令输出的 `id` 填进 `wrangler.jsonc` 的 `kv_namespaces`，替换掉 `REPLACE_WITH_KV_NAMESPACE_ID`。然后：
-
-```bash
-npx wrangler secret put ARK_API_KEY                  # 粘贴火山方舟的 API Key（可选）
+npx wrangler login                     # 浏览器里授权 Cloudflare 账号
+npx wrangler secret put ARK_API_KEY    # 粘贴火山方舟的 API Key（可选）
 npm run deploy
 ```
-
-部署成功后会输出一个 `https://hanzi-kids.<你的子域名>.workers.dev` 地址。以后改了代码，再运行一次 `npm run deploy` 就行。
 
 不设置 `ARK_API_KEY` 也能正常使用，只是不会显示「小墨讲给你听」按钮。
 
@@ -74,7 +81,7 @@ npm run build && npm run dev:worker    # 本地 Worker，端口 8787，前端的
 |---|---|---|
 | `ARK_API_KEY` | `wrangler secret put` | 火山方舟 API Key，设置后开启 AI 讲解 |
 | `ARK_MODEL` | `wrangler.jsonc` 的 `vars` | 模型 ID，默认 `doubao-seed-2-1-lite-260915` |
-| `EXPLANATIONS` | `wrangler.jsonc` 的 `kv_namespaces` | AI 讲解缓存 |
+| `EXPLANATIONS` | `wrangler.jsonc` 的 `kv_namespaces` | AI 讲解缓存，首次部署时自动创建 |
 
 学习进度（星星、贴纸、连续天数）保存在浏览器的 localStorage 里，换设备或清除浏览器数据后会丢失。
 
