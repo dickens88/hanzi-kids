@@ -5,11 +5,11 @@
 - **认一认**：拼音（多音字的每个读音分开列出）、部首、笔画数和简单释义，点一下就能朗读
 - **组一组**：6–8 个常用词，上方标注拼音，点一下就能朗读；多音字的组词按读音分行显示
 - **写一写**：在田字格里看笔顺动画、一笔一笔跟着学，或者自己用手指描红（写错时会给出提示）
-- **小墨讲给你听**（可选）：由火山引擎的豆包大模型用孩子听得懂的话讲解字义，再给一个记字小窍门和一句例句
+- **小墨讲给你听**：由火山引擎的豆包大模型用孩子听得懂的话讲解字义，再给一个记字小窍门和一句例句
 
 首页按课本选册、选课：默认是 2016 版统编教材二年级上册，显示「接着学」那一课的写字表（写一写）和识字表（认一认），每个字点开就能学。写完一个字会按出错次数得 1–3 颗星，并获得一张贴纸，还能直接跳到写字表里的下一个字。生字本里能看到贴纸墙、连续学习天数和识字徽章，还可以挑星星少的字复习。
 
-这是一个纯静态网站，没有后端；所有数据和学习进度都在浏览器里。
+网站主体是纯静态的，所有数据和学习进度都在浏览器里；只有「小墨讲给你听」走一个 Cloudflare Pages Function（`functions/api/explain.js`），由它拿着 API Key 去调用火山方舟。
 
 ## 部署到 Cloudflare Pages
 
@@ -34,21 +34,34 @@ Pages 免费版每次部署最多 2 万个文件，本项目约 7200 个。
 
 查过的字会缓存在 iPad 上，之后断网也能打开。
 
-## AI 讲解（可选）
+## AI 讲解
 
-「小墨讲给你听」需要家长在 App 里填写火山方舟的 API Key：
+「小墨讲给你听」调用同域名下的 `/api/explain`。这个接口是 Cloudflare Pages Function，火山方舟的 API Key 只保存在 Cloudflare 上，浏览器拿不到。
+
+部署前要在火山方舟准备好 Key：
 
 1. 登录 [火山方舟控制台](https://console.volcengine.com/ark)
 2. 在「开通管理」里开通要用的模型（默认是 `doubao-seed-2-1-lite-260915`）
 3. 在「API Key 管理」里创建一个 Key
-4. 打开小墨识字，点右上角的齿轮 → 粘贴 Key → 点「测试」确认能连上 → 点「保存」
 
-注意：
-- Key 只保存在这台设备的浏览器里（localStorage），由浏览器直接发给火山方舟，不经过任何其他服务器
-- 每台设备都要单独填写一次；清除浏览器数据后需要重新填写
-- 讲解结果也缓存在这台设备上，同一个字只会调用一次模型
-- 程序会关闭模型的深度思考，让回答更快、更省钱；想换模型的话，在设置里改「模型 ID」，填方舟控制台模型列表里的完整 ID
-- 不填 Key 也能正常使用，只是不会显示「小墨讲给你听」按钮
+再到 Cloudflare → Workers & Pages → hanzi-kids → Settings 里配置（Production 环境）：
+
+| 名称 | 类型 | 说明 |
+|---|---|---|
+| `ARK_API_KEY` | Variables and Secrets → **Secret** | 火山方舟 API Key，必填 |
+| `ARK_MODEL` | Variables and Secrets → Text | 换模型时填方舟模型列表里的完整 ID，可不填 |
+| `EXPLANATIONS` | Bindings → KV namespace | 按字缓存讲解结果，同一个字全站只调用一次模型；可不绑，但建议绑 |
+
+改完设置后要重新部署一次（Deployments → 最新一次 → Retry deployment）才会生效。
+
+防止接口被刷：
+
+- 接口只接受一个汉字，prompt 和模型都写死在服务端；讲解依据的是网站自己的字典文件，不是请求里的内容
+- 只接受本站页面发来的请求（检查 `Origin`）
+- 建议在 Cloudflare → 域名 → Security → WAF → Rate limiting rules 加一条规则：路径等于 `/api/explain` 时按 IP 限速（比如每 10 秒 10 次），超出就 Block
+- 改了 prompt 或模型后，把 `functions/api/explain.js` 里的 `CACHE_VERSION` 加一，旧缓存就不会再用了
+
+讲解结果在每台设备上也会缓存一份（localStorage），看过的字不会重复请求。程序会关闭模型的深度思考，让回答更快、更省钱。
 
 学习进度（星星、贴纸、连续天数）和选的课本同样保存在 localStorage 里，换设备或清除浏览器数据后会丢失。
 
@@ -59,9 +72,12 @@ Pages 免费版每次部署最多 2 万个文件，本项目约 7200 个。
 ```bash
 npm install
 npm run dev            # http://localhost:5173
+npm run dev:functions  # 另开一个终端：构建并在 :8788 运行 Pages Function，dev 服务器会把 /api 转发过去
 npm run build          # 构建到 dist/
 npm run lint
 ```
+
+本地调试 AI 讲解时，在项目根目录建一个 `.dev.vars` 文件（已在 `.gitignore` 里，不会提交），写一行 `ARK_API_KEY=你的Key`。
 
 ## 字典数据
 
@@ -100,7 +116,9 @@ src/
   views/            页面：首页（查字 + 学字）、生字本
   components/char/  字卡、组词、笔顺面板、AI 讲解
   components/textbook/ 课本选册选课
-  components/common/ 吉祥物、星星、AI 设置弹窗
-  composables/      字典加载、课本、朗读、学习进度、AI 设置
-  utils/            贴纸、音效、火山方舟接口
+  components/common/ 吉祥物、星星
+  composables/      字典加载、课本、朗读、学习进度、AI 讲解缓存
+  utils/            贴纸、音效
+functions/api/      Cloudflare Pages Function：/api/explain
+server/             火山方舟接口和 prompt（只在 Function 里用）
 ```

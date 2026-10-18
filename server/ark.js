@@ -1,4 +1,4 @@
-// Volcengine Ark (Doubao) chat completions, called straight from the browser
+// Volcengine Ark (Doubao) chat completions, called from the Pages Function so the key stays on Cloudflare
 const ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions'
 export const DEFAULT_MODEL = 'doubao-seed-2-1-lite-260915'
 const FIELDS = ['meaning', 'memoryTip', 'sentence']

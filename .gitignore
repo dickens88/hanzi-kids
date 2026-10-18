@@ -5,3 +5,5 @@ public/data/strokes/
 dev-dist/
 .DS_Store
 .env
+.dev.vars
+.wrangler/

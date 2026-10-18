@@ -45,5 +45,7 @@ export default defineConfig({
   ],
   server: {
     host: true,
+    // AI explanations come from the Pages Function; run `npm run dev:functions` alongside
+    proxy: { '/api': { target: 'http://localhost:8788', changeOrigin: true } },
   },
 })
