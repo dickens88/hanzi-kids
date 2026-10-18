@@ -9,7 +9,7 @@
     "predev": "node scripts/copy-strokes.js",
     "prebuild": "node scripts/copy-strokes.js",
     "build": "vite build",
-    "build:dict": "node scripts/build-dict.js",
+    "build:dict": "node scripts/build-textbook.js && node scripts/build-dict.js",
     "lint": "eslint ."
   },
   "engines": {

@@ -12,6 +12,8 @@ const MAPULL = 'https://raw.githubusercontent.com/mapull/chinese-dictionary/mast
 const SOURCES = {
   'char_common_base.json': `${MAPULL}/character/common/char_common_base.json`,
   'char_common_detail.json': `${MAPULL}/character/common/char_common_detail.json`,
+  'char_base.json': `${MAPULL}/character/char_base.json`,
+  'char_detail.json': `${MAPULL}/character/char_detail.json`,
   'word.json': `${MAPULL}/word/word.json`,
   'xinhua-ci.json': 'https://raw.githubusercontent.com/pwxcoo/chinese-xinhua/master/data/ci.json',
   'jieba.txt': 'https://raw.githubusercontent.com/fxsjy/jieba/master/jieba/dict.txt',
@@ -121,9 +123,15 @@ function pickWords(ranked, readingsUsed) {
 async function main() {
   const base = parseLines(await load('char_common_base.json'))
   const detail = new Map(parseLines(await load('char_common_detail.json')).map((d) => [d.char, d]))
+  // textbook characters outside the common list come from the full character set
+  const textbookChars = new Set(JSON.parse(readList('../public/data/textbook.json')).flatMap((b) => b.lessons.flatMap((l) => [...l.xiezi, ...l.shizi])))
+  const common = new Set(base.map((b) => b.char))
+  const extra = new Set([...textbookChars].filter((c) => !common.has(c)))
+  base.push(...parseLines(await load('char_base.json')).filter((b) => extra.has(b.char)))
+  for (const d of parseLines(await load('char_detail.json'))) if (extra.has(d.char)) detail.set(d.char, d)
   const dictWords = new Map(JSON.parse(await load('word.json')).map((w) => [w.word, normPinyin(w.pinyin)]))
   const xinhuaWords = new Set(JSON.parse(await load('xinhua-ci.json')).map((w) => w.ci))
-  const monoPinyin = new Map(base.filter((b) => b.pinyin.length === 1).map((b) => [b.char, normPinyin(b.pinyin[0])]))
+  const monoPinyin = new Map(base.filter((b) => common.has(b.char) && b.pinyin.length === 1).map((b) => [b.char, normPinyin(b.pinyin[0])]))
   // dictionary pinyin, or composed from single-reading characters for well-attested words
   const wordPinyin = (w, n) => {
     if (dictWords.has(w)) return dictWords.get(w)
@@ -186,7 +194,9 @@ async function main() {
     const entry = { char: b.char, radical: b.radicals, strokes: b.strokes, level: b.frequency, readings, words }
     fs.writeFileSync(path.join(outDir, `${b.char.codePointAt(0).toString(16)}.json`), JSON.stringify(entry))
   }
-  console.log(`wrote ${base.length - skipped.length} characters, skipped ${skipped.length}: ${skipped.join('')}`)
+  console.log(`wrote ${base.length - skipped.length} characters (${extra.size} added for the textbook), skipped ${skipped.length}: ${skipped.join('')}`)
+  const missing = [...textbookChars].filter((c) => !fs.existsSync(path.join(outDir, `${c.codePointAt(0).toString(16)}.json`)))
+  if (missing.length) console.log(`textbook characters missing from the dictionary: ${missing.join('')}`)
 }
 
 main()

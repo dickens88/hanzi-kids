@@ -8,10 +8,11 @@ import CharInfo from '../components/char/CharInfo.vue'
 import WordBubbles from '../components/char/WordBubbles.vue'
 import StrokePad from '../components/char/StrokePad.vue'
 import AiExplain from '../components/char/AiExplain.vue'
+import TextbookLessons from '../components/textbook/TextbookLessons.vue'
 import { loadChar } from '../composables/useDict.js'
 import { useProgress } from '../composables/useProgress.js'
+import { useTextbook } from '../composables/useTextbook.js'
 import { lastHanzi } from '../utils/hanzi.js'
-import { dailyPicks } from '../utils/recommend.js'
 import { stickerFor } from '../utils/stickers.js'
 import { playFanfare } from '../utils/sound.js'
 
@@ -20,7 +21,8 @@ const ENCOURAGE = ['再试一次～', '别着急，慢慢来～', '看看绿色�
 
 const route = useRoute()
 const router = useRouter()
-const { record, starsFor } = useProgress()
+const { record } = useProgress()
+const { nextChar } = useTextbook()
 
 const input = ref('')
 const entry = ref(null)
@@ -28,7 +30,6 @@ const notFound = ref(false)
 const message = ref('嗨！我是小墨，输入一个字，我们一起学吧！')
 const result = ref(null)
 const pad = ref(null)
-const picks = dailyPicks(8)
 
 const char = computed(() => (typeof route.query.c === 'string' ? lastHanzi(route.query.c) : null))
 const pick = (list) => list[Math.floor(Math.random() * list.length)]
@@ -59,7 +60,7 @@ watch(input, (text) => {
 
 function onComplete(stars) {
   const { isNew, badge } = record(entry.value.char, stars)
-  result.value = { stars, isNew, badge, sticker: stickerFor(entry.value.char) }
+  result.value = { stars, isNew, badge, sticker: stickerFor(entry.value.char), next: nextChar(entry.value.char) }
   message.value = pick(CHEERS)
   playFanfare()
   confetti({ particleCount: 60 + stars * 40, spread: 80, origin: { y: 0.6 } })
@@ -98,22 +99,7 @@ async function practiceAgain() {
       </div>
     </template>
 
-    <section v-if="!entry || notFound" class="card">
-      <h2 class="mb-3 flex items-center gap-2 text-2xl font-black text-grape">
-        <span class="material-symbols-rounded">wb_sunny</span>今日推荐字
-      </h2>
-      <div class="grid grid-cols-4 gap-3 sm:grid-cols-8">
-        <RouterLink
-          v-for="c in picks"
-          :key="c"
-          :to="{ query: { c } }"
-          class="tian-grid font-kai flex aspect-square flex-col items-center justify-center rounded-2xl text-5xl transition active:scale-95"
-        >
-          {{ c }}
-          <StarRating v-if="starsFor(c)" :stars="starsFor(c)" size="text-sm" />
-        </RouterLink>
-      </div>
-    </section>
+    <TextbookLessons v-if="!entry || notFound" />
 
     <Transition enter-from-class="opacity-0" enter-active-class="transition">
       <div v-if="result" class="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" @click.self="result = null">
@@ -128,8 +114,8 @@ async function practiceAgain() {
             <button class="btn bg-berry text-white" @click="practiceAgain">
               <span class="material-symbols-rounded">replay</span>再写一次
             </button>
-            <button class="btn bg-leaf text-white" @click="result = null; router.push({ query: {} })">
-              <span class="material-symbols-rounded">add</span>学新字
+            <button class="btn bg-leaf text-white" @click="router.push({ query: result.next ? { c: result.next } : {} })">
+              <span class="material-symbols-rounded">{{ result.next ? 'arrow_forward' : 'add' }}</span>{{ result.next ? `下一个「${result.next}」` : '学新字' }}
             </button>
           </div>
         </div>
