@@ -59,11 +59,11 @@ watch(input, (text) => {
 })
 
 function onComplete(stars) {
-  const { isNew, badge } = record(entry.value.char, stars)
-  result.value = { stars, isNew, badge, sticker: stickerFor(entry.value.char), next: nextChar(entry.value.char) }
+  const { isNew, levelUp } = record(entry.value.char, stars)
+  result.value = { stars, isNew, levelUp, sticker: stickerFor(entry.value.char), next: nextChar(entry.value.char) }
   message.value = pick(CHEERS)
   playFanfare()
-  confetti({ particleCount: 60 + stars * 40, spread: 80, origin: { y: 0.6 } })
+  confetti({ particleCount: levelUp ? 250 : 60 + stars * 40, spread: levelUp ? 120 : 80, origin: { y: 0.6 } })
 }
 
 async function practiceAgain() {
@@ -107,9 +107,10 @@ async function practiceAgain() {
           <p class="text-7xl">{{ result.sticker }}</p>
           <p class="mt-2 text-3xl font-black">{{ result.isNew ? '获得新贴纸！' : '又写好一次！' }}</p>
           <StarRating :stars="result.stars" size="text-5xl" class="my-3" />
-          <p v-if="result.badge" class="mb-3 rounded-2xl bg-sun/20 p-3 text-xl font-bold">
-            {{ result.badge.emoji }} 解锁徽章「{{ result.badge.name }}」
-          </p>
+          <div v-if="result.levelUp" class="mb-3 flex items-center gap-3 rounded-2xl bg-sun/20 p-3 text-left">
+            <img :src="result.levelUp.avatar" class="animate-wiggle size-20 shrink-0" alt="" />
+            <p class="text-xl font-bold">升到 Lv{{ result.levelUp.level }} 啦！<br />新头像「{{ result.levelUp.name }}」</p>
+          </div>
           <div class="grid grid-cols-2 gap-3">
             <button class="btn bg-berry text-white" @click="practiceAgain">
               <span class="material-symbols-rounded">replay</span>再写一次

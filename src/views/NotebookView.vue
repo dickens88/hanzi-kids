@@ -2,11 +2,12 @@
 import { useRouter } from 'vue-router'
 import MascotBubble from '../components/common/MascotBubble.vue'
 import StarRating from '../components/common/StarRating.vue'
-import { BADGES, useProgress } from '../composables/useProgress.js'
+import { useProgress } from '../composables/useProgress.js'
+import { LEVELS } from '../utils/levels.js'
 import { stickerFor } from '../utils/stickers.js'
 
 const router = useRouter()
-const { learned, learnedCount, streak, earnedBadges } = useProgress()
+const { learned, learnedCount, streak, level, avatar, chooseAvatar } = useProgress()
 
 // picks a random character among the lowest-starred ones
 function review() {
@@ -15,7 +16,11 @@ function review() {
   router.push({ path: '/', query: { c: pool[Math.floor(Math.random() * pool.length)].char } })
 }
 
-const nextBadge = () => BADGES.find((b) => b.count > learnedCount.value)
+const nextLevel = () => LEVELS[level.value.level]
+const levelPercent = () => {
+  const next = nextLevel()
+  return next ? ((learnedCount.value - level.value.count) / (next.count - level.value.count)) * 100 : 100
+}
 </script>
 
 <template>
@@ -31,17 +36,43 @@ const nextBadge = () => BADGES.find((b) => b.count > learnedCount.value)
         <p class="text-4xl font-black text-sun-dark">🔥 {{ streak }}</p>
         <p class="text-lg">连续天数</p>
       </div>
-      <div class="card col-span-2 flex items-center justify-around">
-        <div v-for="b in BADGES" :key="b.count" class="text-center" :class="!earnedBadges.includes(b) && 'opacity-25 grayscale'">
-          <p class="text-4xl">{{ b.emoji }}</p>
-          <p class="text-sm font-bold">{{ b.name }}</p>
+      <div class="card col-span-2 flex items-center gap-4">
+        <img :src="avatar.avatar" class="size-20 shrink-0" alt="" />
+        <div class="min-w-0 flex-1">
+          <p class="text-xl font-black">Lv{{ level.level }} {{ level.name }}</p>
+          <div class="my-2 h-3 overflow-hidden rounded-full bg-cream">
+            <div class="h-full rounded-full bg-berry transition-all" :style="{ width: `${levelPercent()}%` }" />
+          </div>
+          <p v-if="nextLevel()" class="text-sm">
+            再学 <b class="text-berry">{{ nextLevel().count - learnedCount }}</b> 个字，变成「{{ nextLevel().name }}」
+          </p>
+          <p v-else class="text-sm font-bold text-sun-dark">已经是最高级啦！</p>
         </div>
       </div>
     </section>
 
-    <p v-if="nextBadge()" class="text-center text-lg">
-      再学 <b class="text-berry">{{ nextBadge().count - learnedCount }}</b> 个字，就能得到 {{ nextBadge().emoji }}「{{ nextBadge().name }}」
-    </p>
+    <section class="card">
+      <h2 class="mb-1 flex items-center gap-2 text-2xl font-black text-grape">
+        <span class="material-symbols-rounded">cruelty_free</span>我的兔子
+      </h2>
+      <p class="mb-4 text-gray-500">每升一级就能解锁一只新兔子，点一下换头像</p>
+      <div class="grid grid-cols-4 gap-3 sm:grid-cols-5 lg:grid-cols-10">
+        <button
+          v-for="l in LEVELS"
+          :key="l.level"
+          class="flex flex-col items-center rounded-2xl p-1 transition active:scale-95"
+          :class="l.level === avatar.level ? 'bg-sun/40 ring-4 ring-sun' : ''"
+          :disabled="l.level > level.level"
+          @click="chooseAvatar(l.level)"
+        >
+          <span class="relative">
+            <img :src="l.avatar" class="w-full" :class="l.level > level.level && 'opacity-30 grayscale'" alt="" />
+            <span v-if="l.level > level.level" class="material-symbols-rounded absolute inset-0 m-auto size-fit text-3xl text-gray-500">lock</span>
+          </span>
+          <span class="mt-1 text-xs font-bold">{{ l.level > level.level ? `${l.count} 字` : l.name }}</span>
+        </button>
+      </div>
+    </section>
 
     <section class="card">
       <div class="mb-4 flex items-center justify-between">

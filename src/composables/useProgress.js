@@ -1,12 +1,7 @@
 import { computed, reactive, watch } from 'vue'
+import { LEVELS, levelFor } from '../utils/levels.js'
 
 const KEY = 'hanzi-kids:progress'
-export const BADGES = [
-  { count: 10, emoji: '🌱', name: '识字小芽' },
-  { count: 30, emoji: '🌳', name: '识字小树' },
-  { count: 100, emoji: '🏞️', name: '识字大森林' },
-  { count: 300, emoji: '🎓', name: '识字小博士' },
-]
 
 function read() {
   try {
@@ -17,7 +12,7 @@ function read() {
 }
 
 const saved = read()
-const state = reactive({ chars: saved.chars || {}, days: saved.days || [] })
+const state = reactive({ chars: saved.chars || {}, days: saved.days || [], avatar: saved.avatar || 0 })
 watch(state, () => {
   try {
     localStorage.setItem(KEY, JSON.stringify(state))
@@ -48,7 +43,14 @@ const learned = computed(() =>
     .sort((a, b) => b.lastAt - a.lastAt),
 )
 
-const earnedBadges = computed(() => BADGES.filter((b) => learnedCount.value >= b.count))
+const level = computed(() => levelFor(learnedCount.value))
+
+// The rabbit the child picked; until they pick one it follows the current level.
+const avatar = computed(() => LEVELS[Math.min(state.avatar || level.value.level, level.value.level) - 1])
+
+function chooseAvatar(n) {
+  if (n <= level.value.level) state.avatar = n
+}
 
 // Saves a practice result and reports what was newly unlocked.
 function record(char, stars) {
@@ -61,12 +63,20 @@ function record(char, stars) {
   }
   const today = dayKey(new Date())
   if (!state.days.includes(today)) state.days.push(today)
-  return {
-    isNew: !prev,
-    badge: !prev ? BADGES.find((b) => b.count === learnedCount.value) || null : null,
-  }
+  const levelUp = !prev ? LEVELS.find((l) => l.count === learnedCount.value) || null : null
+  if (levelUp) state.avatar = levelUp.level
+  return { isNew: !prev, levelUp }
 }
 
 export function useProgress() {
-  return { learned, learnedCount, streak, earnedBadges, record, starsFor: (char) => state.chars[char]?.stars || 0 }
+  return {
+    learned,
+    learnedCount,
+    streak,
+    level,
+    avatar,
+    chooseAvatar,
+    record,
+    starsFor: (char) => state.chars[char]?.stars || 0,
+  }
 }

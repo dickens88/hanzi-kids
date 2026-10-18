@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <clipPath id="L11_clip"><circle cx="128" cy="128" r="128"/></clipPath>
+    <radialGradient id="L11_fur" cx=".38" cy=".3" r=".8">
+      <stop offset="0" stop-color="#e2d5cc"/><stop offset=".55" stop-color="#b5a39a"/><stop offset="1" stop-color="#8a7870"/>
+    </radialGradient>
+    <linearGradient id="L11_inner" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7c9cc"/><stop offset="1" stop-color="#e595a0"/>
+    </linearGradient>
+    <radialGradient id="L11_blush">
+      <stop offset="0" stop-color="#ff8fa3" stop-opacity=".9"/><stop offset=".6" stop-color="#ff9fb0" stop-opacity=".6"/><stop offset="1" stop-color="#ffb0bd" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="L11_gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff2a8"/><stop offset=".45" stop-color="#f6c63e"/><stop offset="1" stop-color="#d4921a"/>
+    </linearGradient>
+    <linearGradient id="L11_goldring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff2a8"/><stop offset=".3" stop-color="#e9b032"/><stop offset=".55" stop-color="#fff0a0"/><stop offset=".8" stop-color="#cf8c16"/><stop offset="1" stop-color="#ffe680"/>
+    </linearGradient>
+    <radialGradient id="L11_bg" cx=".5" cy=".42" r=".7">
+      <stop offset="0" stop-color="#4b4a9c"/><stop offset="1" stop-color="#262a63"/>
+    </radialGradient>
+  </defs>
+  <g clip-path="url(#L11_clip)">
+    <rect width="256" height="256" fill="url(#L11_bg)"/>
+    <circle cx="30" cy="60" r="3" fill="#fff" opacity=".8"/><circle cx="60" cy="30" r="2" fill="#fff" opacity=".8"/><circle cx="220" cy="50" r="3" fill="#fff" opacity=".8"/><circle cx="232" cy="130" r="2" fill="#fff" opacity=".8"/><circle cx="24" cy="150" r="2.5" fill="#fff" opacity=".8"/><circle cx="200" cy="200" r="2" fill="#fff" opacity=".8"/><circle cx="50" cy="220" r="2" fill="#fff" opacity=".8"/><path d="M210,81 Q210,90 219,90 Q210,90 210,99 Q210,90 201,90 Q210,90 210,81Z" fill="#ffe680" opacity="1"/><path d="M42,98 Q42,105 49,105 Q42,105 42,112 Q42,105 35,105 Q42,105 42,98Z" fill="#ffe680" opacity="1"/>
+    <g transform="translate(128 40) scale(.9) translate(-128 -40)">
+      
+  <g>
+    <g transform="rotate(-12 96 106)">
+      <path d="M96,106 C70,106 68,60 74,40 C80,20 112,20 118,40 C124,60 122,106 96,106Z" fill="url(#L11_fur)"/>
+      <path d="M96,98 C82,98 80,66 84,50 C88,36 104,36 108,50 C112,66 110,98 96,98Z" fill="url(#L11_inner)"/>
+    </g>
+    <g transform="rotate(30 160 106)">
+      <path d="M160,106 C134,106 132,60 138,40 C144,20 176,20 182,40 C188,60 186,106 160,106Z" fill="url(#L11_fur)"/>
+      <path d="M160,98 C146,98 144,66 148,50 C152,36 168,36 172,50 C176,66 174,98 160,98Z" fill="url(#L11_inner)"/>
+    </g>
+    <ellipse cx="128" cy="300" rx="98" ry="72" fill="url(#L11_fur)"/>
+    <path d="M128,90 C200,90 232,134 232,178 C232,226 188,246 128,246 C68,246 24,226 24,178 C24,134 56,90 128,90Z" fill="url(#L11_fur)"/>
+    <ellipse cx="100" cy="122" rx="40" ry="17" fill="#fff" opacity="0.22"/>
+    <ellipse cx="128" cy="206" rx="40" ry="26" fill="#fff" opacity="0.2"/>
+    <ellipse cx="96" cy="182" rx="13" ry="16" fill="#2b2220"/>
+    <ellipse cx="160" cy="182" rx="13" ry="16" fill="#2b2220"/>
+    <ellipse cx="96" cy="188" rx="9" ry="7" fill="#5a4640" opacity=".55"/>
+    <ellipse cx="160" cy="188" rx="9" ry="7" fill="#5a4640" opacity=".55"/>
+    <circle cx="101" cy="175" r="5.4" fill="#fff"/>
+    <circle cx="165" cy="175" r="5.4" fill="#fff"/>
+    <circle cx="91" cy="189" r="2.3" fill="#fff" opacity=".9"/>
+    <circle cx="155" cy="189" r="2.3" fill="#fff" opacity=".9"/>
+    <ellipse cx="66" cy="206" rx="22" ry="14" fill="url(#L11_blush)"/>
+    <ellipse cx="190" cy="206" rx="22" ry="14" fill="url(#L11_blush)"/>
+    <path d="M123.5,197 Q128,194 132.5,197 Q128,203 123.5,197Z" fill="#e5808f"/>
+    <path d="M120,204 Q124,209.5 128,204.5 Q132,209.5 136,204" stroke="#4a3832" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+      <path d="M70,112 Q112,70 150,4 Q168,60 188,110Z" fill="#7a4fc9"/>
+      <path d="M150,4 Q160,50 176,104 L160,106 Q150,60 150,4Z" fill="#5d36a8"/>
+      <ellipse cx="128" cy="110" rx="76" ry="15" fill="#6440b0"/>
+      <path d="M78,100 Q128,116 182,100" stroke="#ffd34d" stroke-width="6" fill="none"/>
+      <polygon points="118,63 120.4,68.7 126.6,69.2 121.9,73.3 123.3,79.3 118,76.1 112.7,79.3 114.1,73.3 109.4,69.2 115.6,68.7" fill="#ffd34d" stroke-linejoin="round" /><polygon points="146,40 147.6,43.8 151.7,44.1 148.6,46.8 149.5,50.9 146,48.7 142.5,50.9 143.4,46.8 140.3,44.1 144.4,43.8" fill="#ffd34d" stroke-linejoin="round" /><polygon points="160,79 161.3,82.2 164.8,82.5 162.1,84.7 162.9,88 160,86.3 157.1,88 157.9,84.7 155.2,82.5 158.7,82.2" fill="#fff2a8" stroke-linejoin="round" />
+    </g>
+  </g>
+  <circle cx="128" cy="128" r="122" fill="none" stroke="url(#L11_goldring)" stroke-width="9"/>
+</svg>

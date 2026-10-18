@@ -1,7 +1,7 @@
 <script setup>
 import { useProgress } from './composables/useProgress.js'
 
-const { learnedCount } = useProgress()
+const { learnedCount, avatar } = useProgress()
 </script>
 
 <template>
@@ -12,8 +12,8 @@ const { learnedCount } = useProgress()
         <span>小墨识字</span>
       </RouterLink>
       <nav class="flex items-center gap-2">
-        <RouterLink to="/notebook" class="btn bg-white shadow-sm" active-class="!bg-sun">
-          <span class="material-symbols-rounded">menu_book</span>
+        <RouterLink to="/notebook" class="btn bg-white py-1 pl-1 shadow-sm" active-class="!bg-sun">
+          <img :src="avatar.avatar" class="size-10" :alt="avatar.name" />
           <span>生字本</span>
           <span class="rounded-full bg-berry px-2 text-base text-white">{{ learnedCount }}</span>
         </RouterLink>
