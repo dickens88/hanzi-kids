@@ -10,7 +10,7 @@ const props = defineProps({
 const emit = defineEmits(['complete', 'mistake', 'correct'])
 
 const target = ref(null)
-const mode = ref('animate')
+const mode = ref('idle')
 const step = ref(0)
 const total = ref(0)
 const busy = ref(false)
@@ -87,15 +87,13 @@ function startQuiz() {
 watch(
   () => props.char,
   () => {
+    mode.value = 'idle'
+    step.value = 0
     create()
-    animate()
   },
 )
 
-onMounted(() => {
-  create()
-  animate()
-})
+onMounted(create)
 onBeforeUnmount(() => writer?.cancelQuiz())
 
 defineExpose({ startQuiz })
