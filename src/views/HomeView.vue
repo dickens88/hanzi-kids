@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import confetti from 'canvas-confetti'
-import MascotPanda from '../components/common/MascotPanda.vue'
+import MascotBubble from '../components/common/MascotBubble.vue'
 import StarRating from '../components/common/StarRating.vue'
 import CharInfo from '../components/char/CharInfo.vue'
 import WordBubbles from '../components/char/WordBubbles.vue'
@@ -75,7 +75,7 @@ async function practiceAgain() {
 
 <template>
   <div class="space-y-5">
-    <MascotPanda :message="message" />
+    <MascotBubble :message="message" />
 
     <div class="card flex items-center gap-3">
       <span class="material-symbols-rounded text-4xl text-sun-dark">search</span>

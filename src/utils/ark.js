@@ -3,7 +3,7 @@ const ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions'
 export const DEFAULT_MODEL = 'doubao-seed-2-1-lite-260915'
 const FIELDS = ['meaning', 'memoryTip', 'sentence']
 
-const SYSTEM = `你是「小墨」，一只温柔、有趣的小熊猫老师，正在教一个 9 岁的小学生认识汉字。
+const SYSTEM = `你是「小墨」，一个温柔、有趣的小老师，正在教一个 9 岁的小学生认识汉字。
 要求：
 - 用小学三年级孩子能听懂的简单口语，积极、温暖，不吓人，不涉及成人话题。
 - meaning：用一两句话讲清楚这个字最常用的意思（不超过 40 个字）。如果是多音字，讲最常用的读音。

@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import MascotPanda from '../components/common/MascotPanda.vue'
+import MascotBubble from '../components/common/MascotBubble.vue'
 import StarRating from '../components/common/StarRating.vue'
 import { BADGES, useProgress } from '../composables/useProgress.js'
 import { stickerFor } from '../utils/stickers.js'
@@ -20,7 +20,7 @@ const nextBadge = () => BADGES.find((b) => b.count > learnedCount.value)
 
 <template>
   <div class="space-y-5">
-    <MascotPanda :message="learnedCount ? `你已经学会 ${learnedCount} 个字啦！` : '生字本还是空的，快去学第一个字吧！'" />
+    <MascotBubble :message="learnedCount ? `你已经学会 ${learnedCount} 个字啦！` : '生字本还是空的，快去学第一个字吧！'" />
 
     <section class="grid grid-cols-2 gap-4 sm:grid-cols-4">
       <div class="card text-center">

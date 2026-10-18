@@ -52,7 +52,7 @@ async function ask() {
     </button>
     <p v-if="failed" class="mt-2 text-center text-lg text-berry">小墨有点累了，等一下再试试吧～</p>
     <div v-if="result" class="animate-bounce-in space-y-3 text-xl leading-relaxed">
-      <p><span class="mr-2">🐼</span>{{ result.meaning }}</p>
+      <p><img src="/mascot.png" class="mr-2 inline size-8 align-middle" alt="" />{{ result.meaning }}</p>
       <p class="rounded-2xl bg-white/70 p-3"><b class="text-grape">记一记：</b>{{ result.memoryTip }}</p>
       <p class="rounded-2xl bg-white/70 p-3"><b class="text-leaf">说一说：</b>{{ result.sentence }}</p>
       <button class="btn min-h-12 bg-white text-base" @click="speak(`${result.meaning}${result.sentence}`)">

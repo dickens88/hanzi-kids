@@ -1,4 +1,4 @@
-# 小墨识字 🐼
+# 小墨识字
 
 给小朋友学写汉字的 Web 应用，针对平板（iPad / 安卓）的触屏操作做了优化。输入一个汉字，可以看到：
 
@@ -86,6 +86,7 @@ npm run build:dict
 | 汉字、释义、词语拼音 | [mapull/chinese-dictionary](https://github.com/mapull/chinese-dictionary) | MIT |
 | 词语表 | [pwxcoo/chinese-xinhua](https://github.com/pwxcoo/chinese-xinhua) | MIT |
 | 词频 | [fxsjy/jieba](https://github.com/fxsjy/jieba) | MIT |
+| 吉祥物形象 | 家长提供（豆包 AI 生成），裁成圆形头像 `public/mascot.png` | — |
 | 笔顺 | [hanzi-writer-data](https://github.com/chanind/hanzi-writer-data)（源自 Make Me a Hanzi） | Arphic Public License |
 
 字典释义偏向传统辞书的写法，有些条目对孩子来说不太好懂。遇到这种情况，可以用「小墨讲给你听」，或者在 `overrides.json` 里手工修改。
